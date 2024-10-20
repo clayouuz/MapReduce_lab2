@@ -20,7 +20,7 @@ public class TransactionInfluenceAnalysis {
         @Override
         protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String[] fields = value.toString().split(","); // 假设文件按逗号分隔
-            String date = fields[0];
+            // String date = fields[0];
             double interestRate = Double.parseDouble(fields[1]); // 1周利率
             double purchaseAmount = Double.parseDouble(fields[4]); // 资金流入
 

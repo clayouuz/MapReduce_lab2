@@ -7,6 +7,11 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
+import com.example.hadoop.DailyFlowStats;
+import com.example.hadoop.TransactionInfluenceAnalysis;
+import com.example.hadoop.UserActivityAnalysis;
+import com.example.hadoop.WeeklyFlowStats;
+
 public class Main {
 
     public static void main(String[] args) throws Exception {
