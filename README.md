@@ -9,12 +9,12 @@ lastmod: 2024-10-21T21:45:37Z
 ├── README.md
 ├── assets
 │   ├── >for readme
-├── input
+├── input # 输入数据
 │   ├── mfd_bank_shibor.csv
 │   ├── mfd_day_share_interest.csv
 │   ├── user_balance_table.csv
 │   └── user_profile_table.csv
-├── output
+├── output # 输出数据
 │   ├── lab2-1.0-SNAPSHOT.jar
 │   └── output
 │       ├── dailyFlow
@@ -22,14 +22,14 @@ lastmod: 2024-10-21T21:45:37Z
 │       ├── userActivity
 │       └── weeklyFlow
 ├── pom.xml
-├── run.sh
-├── src
+├── run.sh # 运行脚本
+├── src # 源代码
 │   ├── main
 │   │   ├── java
 │   │   └── resources
 │   └── test
 │       └── java
-└── target
+└── target # 编译目录
     ├── >build dir
 
 ```  
