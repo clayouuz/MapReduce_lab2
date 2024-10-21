@@ -79,10 +79,10 @@ public class Main {
             case "transactionInfluence":  // 任务4：交易行为影响因素分析
                 job = Job.getInstance(conf, "Transaction Influence Analysis");
                 job.setJarByClass(TransactionInfluenceAnalysis.class);
-                job.setMapperClass(TransactionInfluenceAnalysis.InfluenceMapper.class);
-                job.setReducerClass(TransactionInfluenceAnalysis.InfluenceReducer.class);
+                job.setMapperClass(TransactionInfluenceAnalysis.YieldMapper.class);
+                job.setReducerClass(TransactionInfluenceAnalysis.YieldReducer.class);
                 job.setOutputKeyClass(Text.class);
-                job.setOutputValueClass(DoubleWritable.class);
+                job.setOutputValueClass(IntWritable.class);
                 break;
 
             default:

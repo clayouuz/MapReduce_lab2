@@ -2,7 +2,7 @@ package com.example.hadoop;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -14,85 +14,83 @@ import java.io.IOException;
 
 public class TransactionInfluenceAnalysis {
 
-    // Mapper class: maps each record to a (Interest Rate Range, Purchase Amount)
-    public static class InfluenceMapper extends Mapper<Object, Text, Text, DoubleWritable> {
+    // 枚举计数器类型，用于全局计数
+    public static enum InfluenceCounter {
+        TOTAL_ONES // 用于统计全局1的数量
+    }
 
-        @Override
-        protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            String[] fields = value.toString().split(","); // 假设文件按逗号分隔
-            // String date = fields[0];
-            double interestRate = Double.parseDouble(fields[1]); // 1周利率
-            double purchaseAmount = Double.parseDouble(fields[4]); // 资金流入
+    public static class YieldMapper extends Mapper<Object, Text, Text, IntWritable> {
 
-            // 将利率分段，例如：0-2%, 2-4%, 4-6%, 6-8%...
-            String interestRateRange = getInterestRateRange(interestRate);
+        // 定义常量1和0，用于表示lambda > y 或 lambda < y
+        private final static IntWritable ONE = new IntWritable(1);
+        private final static IntWritable ZERO = new IntWritable(0);
+        private Text date = new Text();
 
-            // 输出键值对: (利率区间, 资金流入)
-            context.write(new Text(interestRateRange), new DoubleWritable(purchaseAmount));
-        }
+        public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+            String line = value.toString().trim();
 
-        // Helper function: 将利率划分为区间
-        private String getInterestRateRange(double rate) {
-            if (rate < 2.0) {
-                return "0-2%";
-            } else if (rate < 4.0) {
-                return "2-4%";
-            } else if (rate < 6.0) {
-                return "4-6%";
-            } else if (rate < 8.0) {
-                return "6-8%";
-            } else {
-                return "8%+";
+            // 忽略表头
+            if (line.startsWith("mfd_date")) {
+                return;
+            }
+
+            // 使用逗号分隔符解析每行数据，去除空格
+            String[] fields = line.split(",\\s*");
+            if (fields.length == 3) {
+                String mfdDate = fields[0]; // mfd_date 列
+                double mfdDailyYield = Double.parseDouble(fields[1]); // mfd_daily_yield 列
+                double mfdWeeklyYield = Double.parseDouble(fields[2]);
+                // 计算 lambda
+                double lambda = 100 * (Math.pow((mfdDailyYield / 10000 + 1), 365) - 1);
+
+                // 比较 lambda 和 mfd_daily_yield，输出1或0
+                date.set(mfdDate); // 使用日期作为key
+                if (lambda > mfdWeeklyYield) {
+                    context.write(date, ONE); // lambda > y 输出 1
+                } else {
+                    context.write(date, ZERO); // lambda < y 输出 0
+                }
             }
         }
     }
 
-    // Reducer class: calculates average purchase amount per interest rate range
-    public static class InfluenceReducer extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
+    public static class YieldReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+        private int globalOneCount = 0; // 全局1的计数器
+
+        public void reduce(Text key, Iterable<IntWritable> values, Context context)
+                throws IOException, InterruptedException {
+            for (IntWritable val : values) {
+                context.write(key, val); // 输出日期和1或0
+                globalOneCount += val.get(); // 更新全局1的计数器
+            }            
+        }
 
         @Override
-        protected void reduce(Text key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
-            double totalPurchase = 0;
-            int count = 0;
-
-            // 累加所有资金流入值并计算数量
-            for (DoubleWritable val : values) {
-                totalPurchase += val.get();
-                count++;
-            }
-
-            // 计算该利率区间的平均资金流入
-            double avgPurchase = count == 0 ? 0 : totalPurchase / count;
-            context.write(key, new DoubleWritable(avgPurchase));
+        protected void cleanup(Context context) throws IOException, InterruptedException {
+            // 在任务结束时输出全局计数器的值
+            String globalResult = "当日年化收益率小于本周年化收益率: " + globalOneCount + "\n";
+            context.write(new Text(globalResult), null); // 输出全局1的数量
         }
     }
 
-    // main方法：作业配置
     public static void main(String[] args) throws Exception {
-        if (args.length != 2) {
-            System.err.println("Usage: TransactionInfluenceAnalysis <input path> <output path>");
-            System.exit(-1);
-        }
-
         Configuration conf = new Configuration();
         Job job = Job.getInstance(conf, "Transaction Influence Analysis");
-
-        // 设置主类
         job.setJarByClass(TransactionInfluenceAnalysis.class);
 
-        // 设置Mapper和Reducer类
-        job.setMapperClass(InfluenceMapper.class);
-        job.setReducerClass(InfluenceReducer.class);
+        // 设置 Mapper 和 Reducer
+        job.setMapperClass(YieldMapper.class);
+        job.setReducerClass(YieldReducer.class);
 
-        // 设置Map和Reduce输出类型
+        // 设置输出key和value的类型
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(DoubleWritable.class);
+        job.setOutputValueClass(IntWritable.class);
 
-        // 输入和输出路径
-        FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path(args[1]));
+        // 输入输出路径
+        FileInputFormat.addInputPath(job, new Path(args[0])); // 输入路径
+        FileOutputFormat.setOutputPath(job, new Path(args[1])); // 输出路径
 
-        // 提交作业
+        // 提交任务
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }
