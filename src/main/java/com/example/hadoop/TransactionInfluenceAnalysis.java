@@ -68,7 +68,7 @@ public class TransactionInfluenceAnalysis {
         @Override
         protected void cleanup(Context context) throws IOException, InterruptedException {
             // 在任务结束时输出全局计数器的值
-            String globalResult = "当日年化收益率小于本周年化收益率: " + globalOneCount + "\n";
+            String globalResult = "当日年化收益率>本周年化收益率: " + globalOneCount + "\n";
             context.write(new Text(globalResult), null); // 输出全局1的数量
         }
     }
