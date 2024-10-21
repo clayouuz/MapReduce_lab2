@@ -28,6 +28,7 @@ public class UserActivityAnalysis {
                 e.printStackTrace();
             }
 
+
             if (directPurchase > 0 || totalRedeem > 0) {
                 context.write(new Text(userId), new IntWritable(1));
             }
@@ -57,7 +58,6 @@ public class UserActivityAnalysis {
 
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
-
         System.exit(job.waitForCompletion(true) ? 0 : 1);
     }
 }

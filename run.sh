@@ -7,7 +7,8 @@ hdfs dfs -put input/* input/
 
 hadoop jar target/lab2-1.0-SNAPSHOT.jar com.example.Main dailyFlow input/dailyFlow output/dailyFlow
 hadoop jar target/lab2-1.0-SNAPSHOT.jar com.example.Main weeklyFlow output/dailyFlow output/weeklyFlow
-hadoop jar target/lab2-1.0-SNAPSHOT.jar com.example.Main userActivity input/userActivity output/userActivity
+hadoop jar target/lab2-1.0-SNAPSHOT.jar com.example.Main userActivity input/userActivity output/userActivity/raw
+hadoop jar target/lab2-1.0-SNAPSHOT.jar com.example.Main sortByActivateDays output/userActivity/raw output/userActivity/sorted
 hadoop jar target/lab2-1.0-SNAPSHOT.jar com.example.Main transactionInfluence input/transactionInfluence output/transactionInfluence
 
 hdfs dfs -rm -r output
