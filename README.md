@@ -4,7 +4,36 @@ date: 2024-10-21T15:45:14Z
 lastmod: 2024-10-21T21:45:37Z
 ---
 
-# lab2
+```bash
+.
+├── README.md
+├── assets
+│   ├── >for readme
+├── input
+│   ├── mfd_bank_shibor.csv
+│   ├── mfd_day_share_interest.csv
+│   ├── user_balance_table.csv
+│   └── user_profile_table.csv
+├── output
+│   ├── lab2-1.0-SNAPSHOT.jar
+│   └── output
+│       ├── dailyFlow
+│       ├── transactionInfluence
+│       ├── userActivity
+│       └── weeklyFlow
+├── pom.xml
+├── run.sh
+├── src
+│   ├── main
+│   │   ├── java
+│   │   └── resources
+│   └── test
+│       └── java
+└── target
+    ├── >build dir
+
+```  
+
 
 # 任务1：
 
