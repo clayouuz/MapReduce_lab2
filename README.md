@@ -16,11 +16,10 @@ lastmod: 2024-10-21T21:45:37Z
 │   └── user_profile_table.csv
 ├── output # 输出数据
 │   ├── lab2-1.0-SNAPSHOT.jar
-│   └── output
-│       ├── dailyFlow
-│       ├── transactionInfluence
-│       ├── userActivity
-│       └── weeklyFlow
+│   ├── dailyFlow
+│   ├── transactionInfluence
+│   ├── userActivity
+│   └── weeklyFlow
 ├── pom.xml
 ├── run.sh # 运行脚本
 ├── src # 源代码
