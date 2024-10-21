@@ -53,6 +53,7 @@ public class Main {
                 job.setReducerClass(UserActivityAnalysis.ActivityReducer.class);
                 job.setOutputKeyClass(Text.class);
                 job.setOutputValueClass(IntWritable.class);
+                
                 break;
 
             case "transactionInfluence":  // 任务4：交易行为影响因素分析

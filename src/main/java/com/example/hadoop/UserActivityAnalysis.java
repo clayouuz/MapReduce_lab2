@@ -19,8 +19,14 @@ public class UserActivityAnalysis {
         protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             String[] fields = value.toString().split(",");
             String userId = fields[0];
-            long directPurchase = Long.parseLong(fields[5]);
-            long totalRedeem = Long.parseLong(fields[9]);
+            long directPurchase = 0;
+            long totalRedeem =0;
+            try {
+                directPurchase = Long.parseLong(fields[5]);
+                totalRedeem = Long.parseLong(fields[8]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             if (directPurchase > 0 || totalRedeem > 0) {
                 context.write(new Text(userId), new IntWritable(1));

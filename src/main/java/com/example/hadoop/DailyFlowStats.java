@@ -20,7 +20,7 @@ public class DailyFlowStats {
             String[] fields = value.toString().split(",");
             String date = fields[1]; // 交易日期
             String purchaseAmt = fields[4].isEmpty() ? "0" : fields[4]; // 资金流入
-            String redeemAmt = fields[9].isEmpty() ? "0" : fields[9]; // 资金流出
+            String redeemAmt = fields[9].isEmpty() ? "0" : fields[8]; // 资金流出
             context.write(new Text(date), new Text(purchaseAmt + "," + redeemAmt));
         }
     }
@@ -32,8 +32,17 @@ public class DailyFlowStats {
             long totalRedeem = 0;
             for (Text value : values) {
                 String[] amounts = value.toString().split(",");
-                totalPurchase += Long.parseLong(amounts[0]);
-                totalRedeem += Long.parseLong(amounts[1]);
+                if (amounts.length > 0) {
+                    try {
+                        totalPurchase += Long.parseLong(amounts[0]);
+                        totalRedeem += Long.parseLong(amounts[1]);
+                    } catch (NumberFormatException e) {
+                        // 如果amounts[0]不能转换为Long类型，捕获异常并跳过
+                        System.out.println("Skipping non-numeric value: " + amounts[0]);
+                    }
+                }   
+
+                
             }
             context.write(key, new Text(totalPurchase + "," + totalRedeem));
         }
